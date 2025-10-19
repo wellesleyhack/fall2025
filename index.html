@@ -1,361 +1,999 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Whack2025</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&display=swap" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <title>improved main page</title>
+  <!-- Preload critical assets to improve LCP and responsiveness -->
+  <link rel="preload" href="../font/MinecraftRegular.otf" as="font" type="font/otf" crossorigin>
+  <link rel="preload" href="../images/title.png" as="image" fetchpriority="high">
+  <link rel="preload" href="../images/shadow.png" as="image" fetchpriority="high">
   <style>
-    /* Prevent scrollbars from appearing */
-    html, body {
-      overflow: hidden;
-    }
-    .whale {
-      position: absolute;
-      transition: opacity 0.5s ease-out;
-      z-index: -2;
-    }
-
-    body {
-      margin: 0;
+    #loader-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
       height: 100vh;
-      background-color: #2bb8f5;
+      background: #222;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
+      z-index: 2000;
     }
 
-    main {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
+    .loader {
+      width: 60px;
+      aspect-ratio: 1;
+      background:
+        linear-gradient(90deg, #ffffff 50%, #2758e2 0) top/100% 50% no-repeat,
+        linear-gradient(90deg, #3abef9 50%, #fb6222 0);
+      -webkit-mask: linear-gradient(#000 0 0) 0 0/50% 50% no-repeat;
+      mask: linear-gradient(#000 0 0) 0 0/50% 50% no-repeat;
+      animation: l18 2s infinite;
     }
 
-    #whale {
-      position: fixed;
-      bottom: -2.5vh;
-      right: -1vw;
-      width: 15vw;
+    @keyframes l18 {
+      0%   { -webkit-mask-position: 0 0 }
+      25%  { -webkit-mask-position: 100% 0 }
+      50%  { -webkit-mask-position: 100% 100% }
+      75%  { -webkit-mask-position: 0 100% }
+      100% { -webkit-mask-position: 0 0 }
+    }
+
+    @font-face {
+      font-family: 'MinecraftRegular';
+      src: url('../font/MinecraftRegular.otf') format('opentype');
+      font-display: swap; /* allow text to render immediately while font loads */
+    }
+
+    .minecraft-text {
+      font-family: 'MinecraftRegular', monospace;
+      font-size: 30px;
+      width: 50%;
       height: auto;
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #ffffff;
       z-index: 10;
+      pointer-events: none;
     }
 
-    #sub {
-      position: fixed;
-      bottom: 25vh;
-      width: 80vw;
+    html, body {
+      height: 100%;
+      margin: 0;
+      scroll-behavior: smooth;
+      overflow: hidden;
+    }
+
+    .scroll-container {
+      height: 100vh;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .page {
+      height: 100vh;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .background {
+      position: absolute;
+      width: 101vw;
+      height: 101vh;
+      top: -5px;
+      left: -5px;
+      background: url("../images/sky.gif") center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: -2;
+      will-change: background-position;
+    }
+
+    .wave, .bottom-img, .beneath-img {
+      position: absolute;
+      bottom: -75px;
+      left: -10vw;
+      width: 120vw;
+      height: 120vh;
+      object-fit: cover;
+      pointer-events: none;
+      transform: translateX(-50%);
+      will-change: transform;
+      z-index: -1;
+    }
+
+    #title {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+    }
+
+    button {
+      background: none;
+      border: 3px solid;
+      font: inherit;
+      line-height: 1.5;
+      margin: 0.5em;
+      padding: 0.7em 2.5em;
+      color: var(--color);
+      transition: 0.25s;
+      position: absolute;
+      top: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: center;
+      box-sizing: border-box;
+      z-index: 20;
+    }
+
+    button:hover,
+    button:focus {
+      border-color: var(--hover);
+      color: #fff;
+    }
+
+    /* Style anchors inside .buttons to look and act like the original button element */
+    .buttons a {
+      background: none;
+      border: 3px solid;
+      font: inherit;
+      line-height: 1.5;
+      margin: 0.5em;
+      padding: 0.3em 2em;
+      color: var(--color);
+      transition: 0.25s;
+      position: absolute;
+      top: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      transform-origin: center;
+      box-sizing: border-box;
+      z-index: 20;
+      text-decoration: none;
+      display: inline-block;
       text-align: center;
-      color: white;
-      font-size: 24px;
-      font-family: 'Pixelify Sans', sans-serif;
-      z-index: 5;
+      font-family: 'MinecraftRegular', monospace;
+      font-size: 1.9em;
+    }
+
+    .buttons a:hover,
+    .buttons a:focus {
+      border-color: var(--hover);
+      color: #fff;
+      outline: none;
+    }
+
+    .deadline-label {
+      position: absolute;
+      right: 2vw;
+      bottom: 2vh;
+      font-size: smaller;
+      color: #fff;
+      font-family: 'MinecraftRegular', monospace;
+      font-size: 1em;
+      z-index: 25;
+      pointer-events: none;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .offset {  
+      --color: #fb6222;
+      --hover: #fb6222; /* hue-shifted version of the base color */
+
+      box-shadow: 
+        0.3em 0.3em 0 0 var(--color),
+        inset 0.3em 0.3em 0 0 var(--color);
+
+    }
+    .offset:hover,
+    .offset:focus {
+      box-shadow: 
+        0 0 0 0 var(--hover),
+        inset 6em 3.5em 0 0 var(--hover);
     }
 
     #container {
-      position: absolute;
-      left: 62%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      border: 1px black;
-      perspective: 80vw;
-      display: flex;
-      width: 55vw;
-      height: 55vw;
+      position: relative;
+      perspective: 800px;
+      justify-content: center;
+      align-items: center;
+      display: inline-block;
       max-width: 90vw;
-      max-height: 90vh;
+      max-height: 70vh;
+      z-index: 10;
+      width: 60vw;
+      min-width: 220px;
     }
 
     .img-layer {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 60vw;
-      max-width: 100%;
+      width: 100%;
+      max-width: 100vw;
       height: auto;
       transform-origin: center;
-      transition: transform 0.15s ease-out;
       will-change: transform;
     }
 
-    #click-me-text {
-      position: fixed;
-      font-family: 'Pixelify Sans', sans-serif;
-      color: white;
-      font-size: 1.6vw;
+    #shadowImg { z-index: 0; }
+    #mainImg { z-index: 1; position: relative; }
+
+    .bottom-images, .beneath-images {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      left: 0;
+      top: 0;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-      z-index: 999;
+      z-index: 0;
     }
 
-    #placeholder-text {
+    @media (max-width: 700px) {
+      #container { width: 85vw; max-width: 60vh; }
+    }
+
+    @media (max-width: 450px) {
+      #container { width: 98vw; max-width: 40vh; }
+    }
+
+    #loader-gif {
       position: fixed;
-      bottom: 10px;
-      width: 100%;
-      text-align: center;
-      color: white;
-      font-size: 12px;
-      font-family: Arial, sans-serif;
-      z-index: 5;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
     }
 
-    #mc_embed_shell {
-      bottom: 15vh !important;
+    .page6-buttons a {
+      background: none;
+      border: 3px solid;
+      color: var(--color, #fb6222);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      transition: 0.25s;
+      -webkit-font-smoothing: antialiased;
+      cursor: pointer;
     }
-  </style>
+    .page6-buttons a:hover,
+    .page6-buttons a:focus {
+      border-color: var(--hover, #fb6222);
+      color: #fff;
+      outline: none;
+    }
+
+    .page6-panel {
+      position: absolute;
+      left: 55%;
+      top: 50%;
+      transform: translateY(-50%) translateX(24px);
+      opacity: 0;
+      transition: transform 360ms cubic-bezier(.2,.8,.2,1), opacity 360ms ease;
+      color: #fff;
+      font-size: 1.5em;
+      font-family: 'MinecraftRegular', monospace;
+      z-index: 40;
+      max-width: 33vw;
+      min-width: 200px;
+      background: transparent;
+      text-align: left;
+      pointer-events: none;
+    }
+    .page6-panel.show {
+      transform: translateY(-50%) translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Responsive fallback: panels full width on narrow screens */
+    @media (max-width: 700px) {
+      .page6-panel { left: 50%; transform: translate(-50%, 16px); top: auto; bottom: 8vh; max-width: 90vw; }
+      .page6-panel.show { transform: translate(-50%, 0); }
+    }
+  
+/* --- Panel card and non-blocking scroll (injected) --- */
+.page6-panel .card {
+  background: transparent;
+  backdrop-filter: blur(6px);
+  border: transparent;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  line-height: 1.45;
+}
+.page6-panel {
+  overflow: visible;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: auto;
+}
+/* --- end injected --- */
+</style>
 </head>
 <body>
-  <div id="click-me-text">Click Me</div>
-  <!--------- BEGIN SUBSCRIPTION (Mailchimp embed) ‑-------->
-  <div id="mc_embed_shell"
-       style="position:fixed;bottom:190px;width:100%;text-align:center;z-index:5;">
+  <div id="loader-wrapper"><div class="loader"></div></div>
+  <div id="loader-gif">
+    <img src="../images/Loader.gif" alt="Loading..." style="width: 100vw; height: 100vh;" data-duration="1785" loading="eager" fetchpriority="high">
+  </div>
 
-    <!-- Mailchimp’s own CSS -->
-    <link href="//cdn-images.mailchimp.com/embedcode/classic-061523.css" rel="stylesheet" type="text/css">
+  <div class="scroll-container">
+    <section class="page page1">
+      <div class="background" aria-hidden="true"></div>
+      <a id="mlh-trust-badge" style="display:block;max-width:100px;min-width:60px;position:absolute;right:50px;top:0;width:10%;z-index:100" href="https://mlh.io/na?utm_source=na-hackathon&utm_medium=TrustBadge&utm_campaign=2026-season&utm_content=white" target="_blank"><img src="https://s3.amazonaws.com/logged-assets/trust-badge/2026/mlh-trust-badge-2026-white.svg" alt="Major League Hacking 2026 Hackathon Season" style="width:100%"></a>
+      <img class="wave" id="wave1" src="../images/wave1.png" loading="lazy">
+      <img class="wave" id="wave2" src="../images/wave2.gif" loading="lazy">
+      <img class="wave" id="wave3" src="../images/wave3.gif" loading="lazy">
+      <img class="wave" id="wave4" src="../images/wave4.gif" loading="lazy">
+      <div id="title" role="banner">
+        <div id="container">
+          <img id="shadowImg" class="img-layer" src="../images/shadow.png" loading="eager" fetchpriority="high" importance="high">
+          <img id="mainImg" class="img-layer" src="../images/title.png" loading="eager" fetchpriority="high" importance="high">
+        </div>
+      </div>
+      <div class="buttons">
+        <!-- Use an anchor so it opens the registration form in a new tab; preserve button styling and accessibility -->
+        <a class="offset" href="https://forms.gle/LBRGVTyU59hJLcfJ7" target="_blank" rel="noopener noreferrer" role="button">Register!</a>
+      </div>
+      <div class="deadline-label" aria-hidden="true">Application Deadline is Nov 22 @ 11:00am</div>
+    </section>
 
-    <!-- ONE extra rule → keeps input + button inline -->
-    <style>
-      /* keep Mailchimp’s label for a11y but hide it visually */
-      #mc_embed_signup .mc-field-group label{display:none;}
-
-      /* put e-mail box and button on the same line, keep the 6 px gap */
-      #mc_embed_signup .mc-field-group{
-        display:flex;          /* flex makes children share a row[2] */
-        align-items:center;    /* vertical centring */
-        gap:6px;               /* matches the old spacing */
-      }
-
-      /* kill the default top-margin Mailchimp adds to its button */
-      #mc_embed_signup #mc-embedded-subscribe{margin-top:0;}
-    </style>
-
-
-    <!-- Mailchimp embed form (action URL unchanged) -->
-    <form action="https://wellesleyhacks.us16.list-manage.com/subscribe/post?u=4c53985ccfc770a6332f9e87a&amp;id=22596d979a&amp;f_id=000704e0f0"
-          method="post"
-          id="mc-embedded-subscribe-form"
-          name="mc-embedded-subscribe-form"
-          class="validate"
-          target="_self"
-          novalidate
-          style="display:inline-flex;gap:4px;justify-content:center;align-items:center;flex-wrap:nowrap;">
-
-      <!-- e-mail field -->
-      <input type="email"
-             value=""
-             name="EMAIL"
-             class="required email"
-             id="mce-EMAIL"
-             placeholder="Enter your email"
-             required
-             style="height:20px;padding:10px;width:220px;border:none;border-radius:5px;font-family:'Pixelify Sans',sans-serif;">
-
-      <!-- bot-trap (left intact but hidden off-screen) -->
-      <div style="position:absolute;left:-5000px;" aria-hidden="true">
-        <input type="text" name="b_4c53985ccfc770a6332f9e87a_22596d979a" tabindex="-1" value="">
+    <section class="page page2">
+      <div id="about" role="banner" style="top:20%; left:50%; transform:translate(-50%,-25%); position:absolute; z-index:10; width:25vw; display:flex; justify-content:center; align-items:center; pointer-events:none;">
+        <div id="about-container" style="position:relative; perspective:800px; justify-content:center; align-items:center; display:inline-block; max-width:90vw; width:60vw; min-width:220px;">
+          <img id="aboutShadow" class="img-layer" src="../images/about shadow.png" loading="lazy" style="z-index:0;">
+          <img id="aboutMain" class="img-layer" src="../images/about.png" loading="lazy" style="z-index:1; position:relative;">
+        </div>
       </div>
 
-      <!-- submit button -->
-      <input type="submit"
-             value="Subscribe"
-             name="subscribe"
-             id="mc-embedded-subscribe"
-             class="button"
-             style="height:40px;padding:10px 12px;background:#fff;color:#2bb8f5;border:none;border-radius:5px;font-family:'Pixelify Sans',sans-serif;font-weight:bold;cursor:pointer;">
-    </form>
+      <p class="minecraft-text">
+        The Wellesley Hackathon is an annual event that brings together students from more than 50 colleges and universities who are passionate about coding to spend an immersive weekend collaborating on projects!
+      </p>
+
+      <div class="beneath-images">
+  <img class="beneath-img" id="beneath1" src="../images/Beneath1.gif" loading="lazy" style="z-index: 5;">
+        <img class="beneath-img" id="beneath2" src="../images/Light.png" loading="lazy" 
+        style="z-index: 4; width: 40vw; left: 10vw; top: 10vh; opacity: 0.3;">
+        <img class="beneath-img" id="beneath3" src="../images/Beneath2.gif" loading="lazy" style="z-index: 3;">
+        <img class="beneath-img" id="beneath4" src="../images/Beneath3.gif" loading="lazy" style="z-index: 2;">
+        <img class="beneath-img" id="beneath5" src="../images/Light2.png" loading="lazy" 
+        style="z-index: 2; width: 40vw; left: 70vw; top: 10vh; opacity: 0.4;">
+        <img class="beneath-img" id="beneath6" src="../images/Light3.png" loading="lazy" 
+        style="z-index: 1; width: 20vw; left: 50vw; top: 10vh; opacity: 0.3;">
+        <img class="beneath-img" id="beneath7" src="../images/Beneath4.png" loading="lazy" style="z-index: 0;">
+      </div>
+    </section>
+
+    <section class="page page3" style="background-color: #3572ef;">
+      <div style="position: relative; z-index: 1; width: 100%; height: 100%; display:flex; justify-content:center; align-items:center;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align:center; max-width: 80%;">
+          
+          <!-- Left-side vertical button list -->
+          <div class="page6-buttons" 
+              style="position: absolute; left: 25%; top: 50%; transform: translate(-50%, -50%);
+                      display: flex; flex-direction: column; gap: 1.2em; align-items: flex-start; z-index: 30;">
+            <a data-panel="panel-track1" class="offset" role="button" href="#" 
+              style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em;
+                      display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
+              Track 1
+            </a >
+            <a data-panel="panel-track2" class="offset" role="button" href="#" 
+              style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em;
+                      display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">
+              Track 2
+            </a >
+          </div>
+
+          <!-- Panels for each track -->
+          <div class="page6-panel" id="panel-track1" role="dialog" aria-modal="false" aria-hidden="true">
+            <div class="card">
+              <strong>Deep Dive (Technical Innovation) </strong><br>
+              Ambitious technical projects that explore cutting-edge technologies, complex algorithms, or innovative hardware solutions.
+            </div>
+          </div>
+
+          <div class="page6-panel" id="panel-track2" role="dialog" aria-modal="false" aria-hidden="true">
+            <div class="card">
+              <strong>Make Waves (Social impact)</strong><br>
+              Community-focused solutions that create positive ripple effects—from social impact apps to tools that bring people together.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="page page4" style="background-color: #1b6ed3;">
+      <div style="position: relative; z-index: 1; width: 100%; height: 100%; display:flex; justify-content:center; align-items:center;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align:center; max-width: 80%;">
+          <p>
+            Whether you're a coding newbie or a seasoned hacker, Wellesley Hackathon offers an inclusive environment where everyone can learn, create, and have fun together. Join us for a weekend of innovation, collaboration, and unforgettable experiences!
+          </p>
+        </div>
+      </div>
+      <!-- Speakers block: mirrors about/about shadow structure -->
+      <div id="speakers" role="banner" style="top:20%; left:50%; transform:translate(-50%,-25%); position:absolute; z-index:12; width:25vw; display:flex; justify-content:center; align-items:center; pointer-events:none;">
+        <div id="speakers-container" style="position:relative; perspective:800px; justify-content:center; align-items:center; display:inline-block; max-width:90vw; width:60vw; min-width:220px;">
+          <img id="speakersShadow" class="img-layer" src="../images/speakers shadow.png" loading="lazy" style="z-index:5;">
+          <img id="speakersMain" class="img-layer" src="../images/speakers.png" loading="lazy" style="z-index:6; position:relative;">
+        </div>
+      </div>
+    </section>
+
+    <section class="page page5" style="background-color: #1570bf;">
+      <div style="position: absolute; top: 20%; left: 50%; transform: translateX(-50%); z-index: 1; width: 100%; height: auto; display: flex; justify-content: center; align-items: flex-start; pointer-events: none;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align: center; max-width: 80%;">
+          <p>(Rooms are TBD, and the schedule might change.)
+          </p>
+        </div>
+      </div>
+      <div style="position: absolute; top: 33%; left: 50%; transform: translateX(-50%); z-index: 1; width: 100%; height: auto; display: flex; justify-content: center; align-items: flex-start; pointer-events: none;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align: left; max-width: 80%;">
+          <p>
+            Pre-WHACK<br>
+            11/5 Wednesday Virtual Event 1: Info Session<br>
+            Welcome to WHACK! This is an introduction to who we are, what we do, and why you should join. Note: There will be a Q&amp;A session at the end.<br><br>
+
+            11/12 Thursday Virtual Event 2: Discord Game Night!<br>
+            Come join other WHACK participants for some games! Meet new people and have fun!<br><br>
+
+            11/21 Friday In-Person Event 3: Meet &amp; Greet!<br>
+            Relax and idea prep, meet your (potential) teammates in-person! (Highly suggested for those who haven’t joined a team)
+          </p>
+        </div>
+      </div>
+      <div id="timeline" role="banner" style="top:13%; left:50%; transform:translate(-50%,-25%); position:absolute; z-index:10; width:20vw; display:flex; justify-content:center; align-items:center; pointer-events:none;">
+          <div id="timeline-container" style="position:relative; perspective:800px; justify-content:center; align-items:center; display:inline-block; max-width:90vw; width:60vw; min-width:220px;">
+            <img id="timelineShadow" class="img-layer" src="../images/timeline shadow.png" loading="lazy" style="z-index:0;">
+              <img id="timelineMain" class="img-layer" src="../images/timeline.png" loading="lazy" style="z-index:1; position:relative;">
+          </div>
+      </div>
+    </section>
+
+    <section class="page page6" style="background-color: #1c6a96;">
+      <div style="position: relative; z-index: 1; width: 100%; height: 100%; display:flex; justify-content:center; align-items:center;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align:center; max-width: 80%;">
+          <!-- Left-side vertical button list: left 25%, vertically centered -->
+          <div class="page6-buttons" style="position: absolute; left: 25%; top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; gap: 1.2em; align-items: flex-start; z-index: 30;">
+            <a data-panel="panel-what" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">What?</a>
+            <a data-panel="panel-who" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Who?</a>
+            <a data-panel="panel-when" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">When?</a>
+            <a data-panel="panel-where" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Where?</a>
+            <a data-panel="panel-why" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Why?</a>
+            <a data-panel="panel-team" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">Do I need a team to participate?</a>
+            <a data-panel="panel-size" class="offset" role="button" href="#" style="height: 1em; font-size: 1.5em; line-height: 1em; padding: 1em 1.2em; display:inline-flex; align-items:center; justify-content:center; text-decoration:none;">How many team members can I have?</a>
+          </div>
+            <div class="page6-panel" id="panel-what"   role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Wellesley Hackathon is a 24-hour hackathon where you can meet new people, and work to innovate and create a new project, product, or tool.</div></div>
+            <div class="page6-panel" id="panel-who"    role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Any undergraduate student at any college or university! Both first-timers and experienced hackers are welcome! We have something for everyone!</div></div>
+            <div class="page6-panel" id="panel-when"   role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Nov 22-23, 2025</div></div>
+            <div class="page6-panel" id="panel-where"  role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Wellesley College Campus, Lulu Chow Wang Campus Center, Tishman Commons (For students from other institutions, there will be signs to direct you to where you need to be!)</div></div>
+            <div class="page6-panel" id="panel-why"    role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Beyond the learning opportunities and mentorship workshops, WHACK is also a great place to meet other hackers from different backgrounds! Not to mention, we’ll also have awesome swag, prizes, and a few other surprises for our attendees!</div></div>
+            <div class="page6-panel" id="panel-team"   role="dialog" aria-modal="false" aria-hidden="true"><div class="card">You are not required to have a team to register or participate, however, we highly encourage you to meet new people and connect with each other here at the hackathon!</div></div>
+            <div class="page6-panel" id="panel-size"   role="dialog" aria-modal="false" aria-hidden="true"><div class="card">Teams may have up to 4 members.</div></div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="page page7">
+      <div class="bottom-images">
+    <img class="bottom-img" id="bottom5" src="../images/bottom5.png" loading="lazy" style="z-index: 0;">
+    <img class="bottom-img" id="bottom4" src="../images/bottom4.png" loading="lazy" style="z-index: 1;">
+    <img class="bottom-img" id="bottom3" src="../images/bottom3.png" loading="lazy" style="z-index: 2;">
+    <img class="bottom-img" id="bottom2" src="../images/bottom2.gif" loading="lazy" style="z-index: 3;">
+    <img class="bottom-img" id="bottom1" src="../images/bottom1.gif" loading="lazy" style="z-index: 4;">
+      </div>
+      <!-- Sponsors block: mirrors about/about shadow structure -->
+      <div id="sponsors" role="banner" style="top:20%; left:50%; transform:translate(-50%,-25%); position:absolute; z-index:10; width:25vw; display:flex; justify-content:center; align-items:center; pointer-events:none;">
+        <div id="sponsors-container" style="position:relative; perspective:800px; justify-content:center; align-items:center; display:inline-block; max-width:90vw; width:60vw; min-width:220px;">
+          <img id="sponsorsShadow" class="img-layer" src="../images/sponsors shadow.png" loading="lazy" style="z-index:5;">
+          <img id="sponsorsMain" class="img-layer" src="../images/sponsors.png" loading="lazy" style="z-index:6; position:relative;">
+        </div>
+      </div>
+      <div style="position: relative; z-index: 1; width: 100%; height: 100%; display:flex; justify-content:center; align-items:center;">
+        <div style="color: #fff; font-family: 'MinecraftRegular', monospace; font-size: 1em; text-align:center; max-width: 80%;">
+          <p>
+            Coming up soon! If you are interested in sponsoring Wellesley Hackathon, please reach out to us at <a href="mailto:sponsors@wellesleyhacks.org">sponsors@wellesleyhacks.org</a>.
+          </p>
+    </section>
   </div>
-  <!--------- END SUBSCRIPTION ‑-------->
-  
-  <div id="sub">Subscribe to our newsletter to learn more about upcoming events!</div>
+<script>
+  (function(){
+    'use strict';
+    try {
+      document.addEventListener('DOMContentLoaded', () => {
+        // Cache DOM elements with defensive checks
+        const bg = document.querySelector('.background');
+  const waves = Array.from(document.querySelectorAll('.wave')) || [];
+        const container = document.getElementById('container');
+        const mainImg = document.getElementById('mainImg');
+        const shadowImg = document.getElementById('shadowImg');
+        const title = document.getElementById('title');
+        const scrollContainer = document.querySelector('.scroll-container');
+        const loaderGif = document.getElementById('loader-gif');
+        const loaderGifImg = loaderGif && loaderGif.querySelector('img');
+  const aboutContainer = document.getElementById('about-container');
+  const aboutMain = document.getElementById('aboutMain');
+  const aboutShadow = document.getElementById('aboutShadow');
+  // Sponsors elements (mirror of about)
+  const sponsorsContainer = document.getElementById('sponsors-container');
+  const sponsorsMain = document.getElementById('sponsorsMain');
+  const sponsorsShadow = document.getElementById('sponsorsShadow');
+  // Speakers elements (mirror of sponsors/about)
+  const speakersContainer = document.getElementById('speakers-container');
+  const speakersMain = document.getElementById('speakersMain');
+  const speakersShadow = document.getElementById('speakersShadow');
+  // Timeline elements (mirror of sponsors)
+  const timelineContainer = document.getElementById('timeline-container');
+  const timelineMain = document.getElementById('timelineMain');
+  const timelineShadow = document.getElementById('timelineShadow');
 
-  <main>
-    <div id="container">
-      <img id="shadowImg" class="img-layer" src="../images/shadow.png">
-      <img id="mainImg" class="img-layer" src="../images/title.png">
-    </div>
-  </main>
+        if (!scrollContainer) return; // nothing to do if core container missing
 
-  <img id="whale" src="../images/whale.png">
+        // Cache styles for performance (guarded)
+        const bgStyle = bg ? bg.style : { setProperty: () => {} };
+        const mainImgStyle = mainImg ? mainImg.style : { transform: '' };
+        const shadowImgStyle = shadowImg ? shadowImg.style : { transform: '' };
+        const titleStyle = title ? title.style : { opacity: 1, transform: '' };
+        const loaderGifStyle = loaderGif ? loaderGif.style : null;
 
-  <div id="placeholder-text">
-    Interested in sponsoring WHACK? Fill out
-    <a href="https://docs.google.com/spreadsheets/d/1I1-tZ0168397u-7yv_zwCQH5MVmhpgkj/edit?usp=drive_link&ouid=102980471123121705637&rtpof=true&sd=true">
-      this form!
-    </a>
-  </div>
+        // Movement and animation variables
+        const moveFactors = [0.0005, 0.005, 0.01, 0.05, 0.1, 0.15, 0.2];
+  let centerX = window.innerWidth * 0.5;
+  let centerY = window.innerHeight * 0.5;
+  let box = null;
+  let aboutbox = null;
+  let sponsorsbox = null;
+  let speakersbox = null;
+  let timelinebox = null;
+        let lastX = centerX, lastY = centerY;
+        let isAnimating = true;
+
+        // Cache bottom and beneath images with their styles
+        const bottomImgs = [];
+        const beneathImgs = [];
+        for (let i = 1; i <= 5; i++) {
+          const img = document.getElementById(`bottom${i}`);
+          if (img) bottomImgs.push({el: img, style: img.style});
+        }
+        for (let i = 1; i <= 7; i++) {
+          const img = document.getElementById(`beneath${i}`);
+          if (img) beneathImgs.push({el: img, style: img.style});
+        }
+        // Cache wave style objects to reduce lookup cost per-frame
+        const waveStyles = new Array(waves.length);
+        for (let i = 0; i < waves.length; i++) {
+          waveStyles[i] = waves[i] && waves[i].style;
+        }
+
+        function updateBox() { 
+          if (container && container.getBoundingClientRect) box = container.getBoundingClientRect(); 
+        }
+
+        function updateAboutBox() {
+          if (aboutContainer && aboutContainer.getBoundingClientRect) aboutbox = aboutContainer.getBoundingClientRect();
+        }
+
+        function updateSponsorsBox() {
+          if (sponsorsContainer && sponsorsContainer.getBoundingClientRect) sponsorsbox = sponsorsContainer.getBoundingClientRect();
+        }
+
+        function updateSpeakersBox() {
+          if (speakersContainer && speakersContainer.getBoundingClientRect) speakersbox = speakersContainer.getBoundingClientRect();
+        }
+
+        function updateTimelineBox() {
+          if (timelineContainer && timelineContainer.getBoundingClientRect) timelinebox = timelineContainer.getBoundingClientRect();
+        }
+
+  if (aboutMain && aboutMain.addEventListener) aboutMain.addEventListener('load', updateAboutBox);
+  if (sponsorsMain && sponsorsMain.addEventListener) sponsorsMain.addEventListener('load', updateSponsorsBox);
+  if (speakersMain && speakersMain.addEventListener) speakersMain.addEventListener('load', updateSpeakersBox);
+  if (timelineMain && timelineMain.addEventListener) timelineMain.addEventListener('load', updateTimelineBox);
+  window.addEventListener('resize', () => setTimeout(() => { updateAboutBox(); updateSponsorsBox(); updateSpeakersBox(); updateTimelineBox(); }, 16));
+
+        if (mainImg && mainImg.addEventListener) mainImg.addEventListener('load', updateBox);
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            updateBox();
+            centerX = window.innerWidth * 0.5;
+            centerY = window.innerHeight * 0.5;
+            updateAboutBox();
+            updateSponsorsBox();
+            updateSpeakersBox();
+            updateTimelineBox();
+          }, 16);
+        });
+
+        // Throttled pointer movement for parallax effects
+        let pointerMoveQueued = false;
+        let lastPointerEventX = null;
+        let lastPointerEventY = null;
+        function onPointerMove(e) {
+          if (!e) return;
+          if (e.clientX === lastPointerEventX && e.clientY === lastPointerEventY) return;
+          lastPointerEventX = e.clientX;
+          lastPointerEventY = e.clientY;
+          if (pointerMoveQueued) return;
+          pointerMoveQueued = true;
+          requestAnimationFrame(() => {
+            lastX = lastPointerEventX;
+            lastY = lastPointerEventY;
+            pointerMoveQueued = false;
+          });
+        }
+
+        window.addEventListener('pointermove', onPointerMove, {passive: true});
+
+        // Animation loop with FPS cap
+        const TARGET_FPS = 30;
+        const FRAME_INTERVAL = 1000 / TARGET_FPS;
+        let lastFrameTime = performance.now();
+
+        function animate(now) {
+          if (!isAnimating) return;
+          if (!now) now = performance.now();
+          const elapsed = now - lastFrameTime;
+          if (elapsed < FRAME_INTERVAL) {
+            requestAnimationFrame(animate);
+            return;
+          }
+          lastFrameTime = now - (elapsed % FRAME_INTERVAL);
+
+          if (box) {
+            try {
+              const offsetX = lastX - centerX;
+              const offsetY = lastY - centerY;
+              if (bgStyle && bgStyle.backgroundPosition !== undefined) bgStyle.backgroundPosition = `${-offsetX * moveFactors[0]}px ${-offsetY * moveFactors[0]}px`;
+
+              for (let i = 0; i < waves.length; i++) {
+                const ws = waveStyles[i];
+                const tx = offsetX * (moveFactors[i] + 0.05);
+                const ty = offsetY * (moveFactors[i] + 0.05);
+                if (ws) ws.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+              }
+
+              for (let i = 0; i < bottomImgs.length; i++) {
+                const imgObj = bottomImgs[i];
+                const factor = moveFactors[moveFactors.length - 1 - i] || 0.05;
+                const tx = offsetX * factor * 0.75;
+                const ty = offsetY * factor * 0.75;
+                if (imgObj.style) imgObj.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+              }
+
+              for (let i = 0; i < beneathImgs.length; i++) {
+                const imgObj = beneathImgs[i];
+                const factor = moveFactors[moveFactors.length - 1 - i] || 0.02;
+                const tx = offsetX * factor * 1.1;
+                const ty = offsetY * factor * 1.1;
+                if (imgObj.style) imgObj.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+              }
+
+              const centerBx = box.left + box.width * 0.5;
+              const centerBy = box.top + box.height * 0.5;
+              const dx = lastX - centerBx;
+              const dy = lastY - centerBy;
+              const percentX = dx / (box.width * 0.5);
+              const percentY = dy / (box.height * 0.5);
+              const rotateX = (-percentY * 15);
+              const rotateY = (percentX * 15);
+              const scale = 1 + ((Math.abs(percentX) + Math.abs(percentY)) * 0.5) * 0.1;
+              if (mainImgStyle) mainImgStyle.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${scale}, ${scale}, 1)`;
+
+              const shadowScale = scale * 1.07;
+              const offsetX2 = percentX * 10;
+              const offsetY2 = percentY * 10;
+              if (shadowImgStyle) shadowImgStyle.transform = `translate3d(${offsetX2}px, ${offsetY2}px, 0) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(${shadowScale}, ${shadowScale}, 1)`;
+
+              if (aboutbox) {
+                const vdx = lastX - centerX;
+                const vdy = lastY - centerY;
+                const halfW = window.innerWidth * 0.5 || 1;
+                const halfH = window.innerHeight * 0.5 || 1;
+                let apercentX = vdx / halfW;
+                let apercentY = vdy / halfH;
+                apercentX = Math.max(-1, Math.min(1, apercentX));
+                apercentY = Math.max(-1, Math.min(1, apercentY));
+                const strength = 0.6;
+                const arotateX = (-apercentY * 15 * strength);
+                const arotateY = (apercentX * 15 * strength);
+                const ascale = 1 + ((Math.abs(apercentX) + Math.abs(apercentY)) * 0.5) * 0.05;
+                if (aboutMain && aboutMain.style) aboutMain.style.transform = `rotateX(${arotateX}deg) rotateY(${arotateY}deg) scale3d(${ascale}, ${ascale}, 1)`;
+                if (aboutShadow && aboutShadow.style) aboutShadow.style.transform = `translate3d(${apercentX * 8}px, ${apercentY * 8}px, 0) rotateX(${arotateX}deg) rotateY(${arotateY}deg) scale3d(${ascale * 1.07}, ${ascale * 1.07}, 1)`;
+              }
+
+              // Sponsors: apply same tilt/parallax behavior if present
+              if (sponsorsbox) {
+                const sdx = lastX - centerX;
+                const sdy = lastY - centerY;
+                const shalfW = window.innerWidth * 0.5 || 1;
+                const shalfH = window.innerHeight * 0.5 || 1;
+                let spercentX = sdx / shalfW;
+                let spercentY = sdy / shalfH;
+                spercentX = Math.max(-1, Math.min(1, spercentX));
+                spercentY = Math.max(-1, Math.min(1, spercentY));
+                const sstrength = 0.6;
+                const srotateX = (-spercentY * 15 * sstrength);
+                const srotateY = (spercentX * 15 * sstrength);
+                const sscale = 1 + ((Math.abs(spercentX) + Math.abs(spercentY)) * 0.5) * 0.05;
+                if (sponsorsMain && sponsorsMain.style) sponsorsMain.style.transform = `rotateX(${srotateX}deg) rotateY(${srotateY}deg) scale3d(${sscale}, ${sscale}, 1)`;
+                if (sponsorsShadow && sponsorsShadow.style) sponsorsShadow.style.transform = `translate3d(${spercentX * 8}px, ${spercentY * 8}px, 0) rotateX(${srotateX}deg) rotateY(${srotateY}deg) scale3d(${sscale * 1.07}, ${sscale * 1.07}, 1)`;
+              }
+                // Speakers: apply same tilt/parallax behavior if present
+                if (speakersbox) {
+                  const spdx = lastX - centerX;
+                  const spdy = lastY - centerY;
+                  const sphalfW = window.innerWidth * 0.5 || 1;
+                  const sphalfH = window.innerHeight * 0.5 || 1;
+                  let spercentX2 = spdx / sphalfW;
+                  let spercentY2 = spdy / sphalfH;
+                  spercentX2 = Math.max(-1, Math.min(1, spercentX2));
+                  spercentY2 = Math.max(-1, Math.min(1, spercentY2));
+                  const sstrength2 = 0.6;
+                  const srotateX2 = (-spercentY2 * 15 * sstrength2);
+                  const srotateY2 = (spercentX2 * 15 * sstrength2);
+                  const sscale2 = 1 + ((Math.abs(spercentX2) + Math.abs(spercentY2)) * 0.5) * 0.05;
+                  if (speakersMain && speakersMain.style) speakersMain.style.transform = `rotateX(${srotateX2}deg) rotateY(${srotateY2}deg) scale3d(${sscale2}, ${sscale2}, 1)`;
+                  if (speakersShadow && speakersShadow.style) speakersShadow.style.transform = `translate3d(${spercentX2 * 8}px, ${spercentY2 * 8}px, 0) rotateX(${srotateX2}deg) rotateY(${srotateY2}deg) scale3d(${sscale2 * 1.07}, ${sscale2 * 1.07}, 1)`;
+                }
+              // Timeline: apply same tilt/parallax behavior if present
+              if (timelinebox) {
+                const tdx = lastX - centerX;
+                const tdy = lastY - centerY;
+                const thalfW = window.innerWidth * 0.5 || 1;
+                const thalfH = window.innerHeight * 0.5 || 1;
+                let tpercentX = tdx / thalfW;
+                let tpercentY = tdy / thalfH;
+                tpercentX = Math.max(-1, Math.min(1, tpercentX));
+                tpercentY = Math.max(-1, Math.min(1, tpercentY));
+                const tstrength = 0.6;
+                const trotateX = (-tpercentY * 15 * tstrength);
+                const trotateY = (tpercentX * 15 * tstrength);
+                const tscale = 1 + ((Math.abs(tpercentX) + Math.abs(tpercentY)) * 0.5) * 0.05;
+                if (timelineMain && timelineMain.style) timelineMain.style.transform = `rotateX(${trotateX}deg) rotateY(${trotateY}deg) scale3d(${tscale}, ${tscale}, 1)`;
+                if (timelineShadow && timelineShadow.style) timelineShadow.style.transform = `translate3d(${tpercentX * 8}px, ${tpercentY * 8}px, 0) rotateX(${trotateX}deg) rotateY(${trotateY}deg) scale3d(${tscale * 1.07}, ${tscale * 1.07}, 1)`;
+              }
+            } catch (innerErr) {
+              // swallow individual frame errors to avoid killing the loop
+              console.error('frame error', innerErr);
+            }
+          }
+          requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+
+        // Reset on blur
+        window.addEventListener('blur', () => {
+          if (mainImgStyle) mainImgStyle.transform = '';
+          if (shadowImgStyle) shadowImgStyle.transform = '';
+        });
+
+        // Loader GIF management
+        const loaderGifDuration = parseInt(loaderGifImg && loaderGifImg.dataset && loaderGifImg.dataset.duration) || 1100;
+        let currentGifSrc = '';
+
+        function showLoaderGif() {
+          if (!loaderGif || !loaderGifImg || !loaderGifStyle) return;
+          if (loaderGifStyle.opacity !== '1') {
+            if (!currentGifSrc) currentGifSrc = loaderGifImg.src;
+            // refresh GIF
+            try { loaderGifImg.src = currentGifSrc + '?t=' + Date.now(); } catch(e){}
+            loaderGifStyle.opacity = '1';
+            loaderGifStyle.pointerEvents = 'auto';
+          }
+        }
+
+        function hideLoaderGif() {
+          if (loaderGifStyle && loaderGifStyle.opacity !== '0') {
+            loaderGifStyle.opacity = '0';
+            loaderGifStyle.pointerEvents = 'none';
+          }
+        }
+
+        // Improved wheel/touchpad handling: one page per gesture
+        (function installWheelPager(){
+          const pages = document.querySelectorAll('.page');
+          const pageCount = pages.length;
+          const scrollLockDuration = 700;
+          let isDelayingScroll = false;
+          scrollContainer.addEventListener('wheel', (e) => {
+            if (!e) return;
+            e.preventDefault();
+            if (!e.deltaY) return;
+            if (isDelayingScroll) return;
+            const direction = e.deltaY > 0 ? 1 : -1;
+            const currentPage = Math.round(scrollContainer.scrollTop / window.innerHeight || 0);
+            let targetPage = currentPage + direction;
+            if (targetPage < 0) targetPage = 0;
+            if (targetPage > pageCount - 1) targetPage = pageCount - 1;
+            if (targetPage === currentPage) return;
+            isDelayingScroll = true;
+            showLoaderGif();
+            const waitForGif = (ms) => new Promise(res => setTimeout(res, ms));
+            (async () => {
+              const maxGifWait = 950;
+              const fraction = 0.4;
+              const gifWait = Math.min(Math.round((loaderGifDuration || 1200) * fraction), maxGifWait);
+              await waitForGif(gifWait);
+              try { scrollContainer.scrollTo({ top: targetPage * window.innerHeight, behavior: 'smooth' }); } catch(e) { scrollContainer.scrollTop = targetPage * window.innerHeight; }
+              setTimeout(() => { hideLoaderGif(); }, Math.min(loaderGifDuration, 600));
+              setTimeout(() => { isDelayingScroll = false; }, scrollLockDuration);
+            })();
+          }, { passive: false });
+        })();
+
+        // Optimized scroll position tracking
+        let scrollTicking = false;
+        const vh = window.innerHeight;
+        function onScroll() {
+          if (scrollTicking) return;
+          scrollTicking = true;
+          requestAnimationFrame(() => {
+            const scrollY = scrollContainer.scrollTop;
+            if (scrollY < vh) {
+              if (titleStyle) { titleStyle.opacity = '1'; titleStyle.transform = 'translate(-50%, -50%)'; }
+            } else if (scrollY < vh * 2) {
+              const progress = (scrollY - vh) / vh;
+              if (titleStyle) { titleStyle.opacity = 1 - 0.5 * progress; titleStyle.transform = 'translate(-50%, -50%)'; }
+            } else {
+              if (titleStyle) { titleStyle.opacity = '0.5'; titleStyle.transform = 'translate(-50%, -100vh)'; }
+            }
+            scrollTicking = false;
+          });
+        }
+        scrollContainer.addEventListener('scroll', onScroll, {passive: true});
+        onScroll();
+        updateBox();
+        updateAboutBox();
+        updateSponsorsBox();
+        updateSpeakersBox();
+        updateTimelineBox();
+      });
+
+      // Optimized window load handler
+      window.addEventListener('load', () => {
+        try {
+          const loader = document.getElementById('loader-wrapper');
+          const loaderGif = document.getElementById('loader-gif');
+          if (!loader) {
+            document.body.classList.remove('loading-bg');
+            return;
+          }
+          const showGifTimer = setTimeout(() => {
+            if (loaderGif) { loaderGif.style.opacity = '1'; loaderGif.style.pointerEvents = 'auto'; }
+          }, 500);
+          const hideLoaderTimer = setTimeout(() => {
+            loader.style.opacity = '0';
+            const removeLoaderTimer = setTimeout(() => {
+              try { loader.remove(); } catch(e){}
+              const finalCleanupTimer = setTimeout(() => {
+                if (loaderGif) { loaderGif.style.opacity = '0'; loaderGif.style.pointerEvents = 'none'; }
+                document.body.classList.remove('loading-bg');
+              }, 120);
+            }, 500);
+          }, 1000);
+        } catch(e) { console.error('load handler', e); }
+      });
+    } catch (err) {
+      console.error('initialization error', err);
+    }
+  })();
+</script>
 
 <script>
-  (function () {
-    const container = document.getElementById('container');
-    const mainImg = document.getElementById('mainImg');
-    const shadowImg = document.getElementById('shadowImg');
-    const maxRotation = 15;
-    const maxScale = 1.1;
-    const shadowOffset = 10;
+document.addEventListener('DOMContentLoaded', () => {
+  function initPanels(sectionSelector) {
+    const section = document.querySelector(sectionSelector);
+    if (!section) return;
 
-    let box = null;
-    let ticking = false;
-    let lastEvent = null;
+    const btns = Array.from(section.querySelectorAll('.page6-buttons [data-panel]'));
+    const panels = new Map();
+    section.querySelectorAll('.page6-panel[id]').forEach(p => panels.set(p.id, p));
 
-    function updateBox() {
-      box = container.getBoundingClientRect();
+    let openId = null;
+
+    function showPanel(id, btn) {
+      if (openId && panels.get(openId)) {
+        hidePanel(openId);
+        if (openId === id) return;
+      }
+      const panel = panels.get(id);
+      if (!panel) return;
+      panel.classList.add('show');
+      panel.setAttribute('aria-hidden', 'false');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      openId = id;
     }
 
-    function applyTransform(e) {
-      const centerX = box.left + box.width / 2;
-      const centerY = box.top + box.height / 2;
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
+    function hidePanel(id) {
+      const panel = panels.get(id);
+      if (!panel) return;
+      panel.classList.remove('show');
+      panel.setAttribute('aria-hidden', 'true');
+      btns.forEach(b => {
+        if (b.getAttribute('data-panel') === id) b.setAttribute('aria-expanded', 'false');
+      });
+      if (openId === id) openId = null;
+    }
 
-      const percentX = dx / (box.width / 2);
-      const percentY = dy / (box.height / 2);
-
-      const rotateX = (-percentY * maxRotation).toFixed(2);
-      const rotateY = (percentX * maxRotation).toFixed(2);
-      const scale = (1 + ((Math.abs(percentX) + Math.abs(percentY)) / 2) * (maxScale - 1)).toFixed(3);
-
-      mainImg.style.transform =
-        `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale})`;
-
-      const shadowScale = (scale * 1.05).toFixed(3);
-      const offsetX = (percentX * shadowOffset).toFixed(1);
-      const offsetY = (percentY * shadowOffset).toFixed(1);
-      shadowImg.style.transform =
-        `translate(${offsetX}px, ${offsetY}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${shadowScale})`;
-
-      // Apply the same transformation to all whales and their shadows
-      const whales = document.querySelectorAll('.whale');
-      const whaleShadows = document.querySelectorAll('.whale-shadow');
-      whales.forEach((whale, index) => {
-        whale.style.transformOrigin = 'center center';
-        whale.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${shadowScale})`;
-
-        const whaleShadow = whaleShadows[index];
-        if (whaleShadow) {
-          whaleShadow.style.transformOrigin = 'center center';
-          whaleShadow.style.transform = `translate(${offsetX}px, ${offsetY}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${shadowScale})`;
+    btns.forEach(btn => {
+      if (!btn.hasAttribute('aria-expanded')) btn.setAttribute('aria-expanded', 'false');
+      if (!btn.hasAttribute('role')) btn.setAttribute('role', 'button');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = btn.getAttribute('data-panel');
+        if (!id) return;
+        if (openId === id) hidePanel(id);
+        else showPanel(id, btn);
+      });
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          btn.click();
         }
       });
+      btn.tabIndex = 0;
+    });
 
-      ticking = false;
-    }
-
-    function onPointerMove(e) {
-      lastEvent = e;
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(() => applyTransform(lastEvent));
+    section.addEventListener('pointerdown', (e) => {
+      if (!openId) return;
+      const panel = panels.get(openId);
+      if (panel && !panel.contains(e.target) && !btns.includes(e.target)) {
+        hidePanel(openId);
       }
-    }
-
-    function resetTransform() {
-      mainImg.style.transform = '';
-      shadowImg.style.transform = '';
-      ticking = false;
-
-      // Reset transformation for all whales and their shadows
-      const whales = document.querySelectorAll('.whale');
-      const whaleShadows = document.querySelectorAll('.whale-shadow');
-      whales.forEach(whale => {
-        whale.style.transform = '';
-      });
-      whaleShadows.forEach(whaleShadow => {
-        whaleShadow.style.transform = '';
-      });
-    }
-
-    function syncContainerToImage() {
-      container.style.width = `${mainImg.offsetWidth * 1.5}px`;
-      container.style.height = `${mainImg.offsetHeight * 1.5}px`;
-      updateBox();
-    }
-
-    mainImg.addEventListener('load', syncContainerToImage);
-    window.addEventListener('resize', updateBox);
-
-    document.addEventListener('pointermove', onPointerMove);
-    document.addEventListener('pointerleave', resetTransform);
-    document.addEventListener('pointercancel', resetTransform);
-    document.addEventListener('pointerout', resetTransform);
-  })();
-
-  window.onclick = function (event) {
-    const whale = document.createElement('img');
-    const whaleShadow = document.createElement('img');
-    // Use a size relative to viewport width (between 6vw and 18vw)
-    const size = Math.random() * 12 + 6; // vw
-
-    whale.src = '../images/whale.gif';
-    whale.classList.add('whale');
-    whale.style.width = size + 'vw';
-    whale.style.height = 'auto';
-
-    whaleShadow.src = '../images/whaleshadow.png';
-    whaleShadow.classList.add('whale-shadow');
-    whaleShadow.style.width = size + 'vw';
-    whaleShadow.style.height = 'auto';
-    whaleShadow.style.position = 'absolute';
-    whaleShadow.style.zIndex = -2;
-
-    // Calculate maxLeft and maxTop in vw/vh
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const pxSize = vw * (size / 100);
-
-    const maxLeft = vw - pxSize;
-    const maxTop = vh - pxSize;
-
-    const x = Math.min(event.clientX - pxSize / 2, maxLeft);
-    const y = Math.min(event.clientY - pxSize / 2, maxTop);
-
-    whale.style.left = (x / vw * 100) + 'vw';
-    whale.style.top = (y / vh * 100) + 'vh';
-    whale.style.transformOrigin = 'center center';
-
-    whaleShadow.style.left = (x / vw * 100) + 'vw';
-    whaleShadow.style.top = (y / vh * 100) + 'vh';
-    whaleShadow.style.transformOrigin = 'center center';
-
-    document.body.appendChild(whaleShadow);
-    document.body.appendChild(whale);
-
-    setTimeout(() => { whale.src = '../images/whale.png'; }, 700);
-  };
-
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let hasClicked = false;
-
-  document.addEventListener('mousemove', function (e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  document.addEventListener('click', function () {
-    hasClicked = true;
-  });
-
-  function showClickMe() {
-    const clickMe = document.getElementById('click-me-text');
-    clickMe.style.left = (mouseX + 12) + 'px';
-    clickMe.style.top = (mouseY + 12) + 'px';
-    clickMe.style.opacity = 1;
-
-    setTimeout(() => {
-      clickMe.style.opacity = 0;
-    }, 1000);
+    });
   }
 
-  setTimeout(() => {
-    showClickMe();
-    setInterval(() => {
-      showClickMe();
-    }, 5000);
-  }, 2000);
+  initPanels('.page3');
+  initPanels('.page6');
+
+  const scrollContainer = document.querySelector('.scroll-container');
+  if (scrollContainer) {
+    let lastPage = 0;
+    scrollContainer.addEventListener('scroll', () => {
+      const current = Math.round(scrollContainer.scrollTop / window.innerHeight || 0);
+      if (current !== lastPage) {
+        document.querySelectorAll('.page6-panel.show').forEach(p => {
+          p.classList.remove('show');
+          p.setAttribute('aria-hidden', 'true');
+        });
+        document.querySelectorAll('.page6-buttons [data-panel][aria-expanded="true"]').forEach(b => {
+          b.setAttribute('aria-expanded', 'false');
+        });
+        lastPage = current;
+      }
+    }, { passive: true });
+  }
+});
 </script>
 
 </body>
